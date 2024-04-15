@@ -1,0 +1,90 @@
+server:
+  port: 8081
+
+  tomcat:
+    uri-encoding: UTF-8
+    threads:
+      max: 1000
+      min-spare: 30
+    max-swallow-size: -1
+  shutdown: graceful
+spring:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/topic?useUnicode=true&characterEncoding=utf-8&allowMultiQueries=true&useSSL=false&serverTimezone=GMT%2b8&allowPublicKeyRetrieval=true
+    username: root
+    password: lb112665
+
+    druid:
+      filter:
+        wall:
+          config:
+            multi-statement-allow: true
+    hikari:
+      max-lifetime: 60000
+      maximum-pool-size: 1000
+  jpa:
+    show-sql: true
+    hibernate:
+      ddl-auto: update
+  redis:
+    host: 127.0.0.1
+    database: 0
+    port: 6379
+    timeout: 3S
+  servlet:
+    multipart:
+      max-file-size: 50MB
+      max-request-size: 50MB
+  jackson:
+    time-zone: GMT+8
+    serialization:
+      fail-on-empty-beans: false
+intercept:
+  verification:
+    - /zwz/login
+    - /zwz/user/regist
+  wechat:
+    - /zwz/user/smsLogin
+    - /zwz/user/resetByMobile
+    - /zwz/user/changeMobile
+release:
+  authentication:
+    - /zwz/actuator/**
+    - /zwz/dictData/getByType/**
+    - /zwz/file/view/**
+    - /zwz/ws/**
+    - /zwz/setting/notice
+    - /zwz/user/regist
+    - /zwz/common/**
+    - /**/*.js
+    - /**/*.css
+    - /**/*.png
+    - /**/*.ico
+    - /zwz/test/**
+  limiting:
+    - /**/*.js
+    - /**/*.css
+    - /**/*.png
+    - /**/*.ico
+mybatis-plus:
+  global-config:
+    db-config:
+      logic-delete-value: 1
+      logic-not-delete-value: 0
+  mapper-locations: classpath*:mapper/*.xml
+  configuration:
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+logging:
+  level:
+    root: info
+  file:
+    path: logs
+  logback:
+    rollingpolicy:
+      max-history: 2000
+      max-file-size: 5MB
+
+dependencies:
+    groupId: org.springframework.boot
+    artifactId: spring-boot-starter-websocket
