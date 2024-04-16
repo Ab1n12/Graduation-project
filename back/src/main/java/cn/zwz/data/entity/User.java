@@ -103,4 +103,17 @@ public class User extends BaseEntity {
     @TableField(exist=false)
     @ApiModelProperty(value = "用户拥有的角色列表")
     private List<RoleDTO> roles;
+
+    //以下属性为学生用户使用
+    @ApiModelProperty(value = "学生选题的id")
+    private String topicId; //用于学生用户在我的选题界面查询自己的选题
+
+    @ApiModelProperty(value = "学生选题的名称")
+    private String topicName; //用于教师用户查询选了自己题目的学生选择了哪个题目
+
+    @ApiModelProperty(value = "学生选题的导师id")
+    private String myTeaId; //用于教师用户查询选了自己题目的学生
+
+    @ApiModelProperty(value = "学生选题是否被审核")
+    private boolean audit; //用于教师用户查询选了自己题目的学生
 }

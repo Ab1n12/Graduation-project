@@ -30,3 +30,22 @@ export const auditTopic = (params) => {
 export const checkNotTopic = (params) => {
     return postRequest('/topic/checkNotTopic', params)
 }
+
+export const checkNotTopicByTea = (params) => {
+    return postRequest('/topic/checkNotTopicByTea', params)
+}
+
+export const getMyStudent = (params) => {
+    return postRequest('/topic/getMyStudent', params)
+}
+
+export const getAllUser = (params) => {
+    return postRequest('/topic/getAllUser', params)
+}
+export const getUserByPermission = (params) => {
+    return getRequest('/permission/getUserByPermission', params)
+}
+
+export const getUserList = (params) => {
+    return getRequest('/user/getMyStudent', params)
+}

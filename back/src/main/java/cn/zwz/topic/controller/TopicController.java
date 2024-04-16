@@ -6,6 +6,7 @@ import cn.zwz.basics.baseVo.PageVo;
 import cn.zwz.basics.baseVo.Result;
 import cn.zwz.basics.utils.SecurityUtil;
 import cn.zwz.data.entity.User;
+import cn.zwz.data.service.IRoleService;
 import cn.zwz.data.service.IUserService;
 import cn.zwz.data.utils.NullUtils;
 import cn.zwz.topic.entity.Topic;
@@ -38,6 +39,9 @@ public class TopicController {
     @Autowired
     private SecurityUtil securityUtil;
 
+    @Autowired
+    private IRoleService iRoleService;
+
     @RequestMapping(value = "/getOne", method = RequestMethod.GET)
     @ApiOperation(value = "查询单条毕业设计课题")
     public Result<Topic> get(@RequestParam String id){
@@ -54,6 +58,13 @@ public class TopicController {
     @ApiOperation(value = "查询全部毕业设计课题")
     public Result<List<Topic>> getAll(){
         return new ResultUtil<List<Topic>>().setData(iTopicService.list());
+    }
+
+
+    @RequestMapping(value = "/getAllUser", method = RequestMethod.GET)
+    @ApiOperation(value = "查询全部用户")
+    public Result<List<User>> getAllUser(){
+        return new ResultUtil<List<User>>().setData(iUserService.list());
     }
 
     @RequestMapping(value = "/getByPage", method = RequestMethod.GET)
@@ -74,6 +85,16 @@ public class TopicController {
         return new ResultUtil<IPage<Topic>>().setData(data);
     }
 
+    @RequestMapping(value = "/getByPageForAudit", method = RequestMethod.GET)
+    @ApiOperation(value = "查询我发布的毕业设计课题")
+    public Result<IPage<Topic>> getByPageForAudit(@ModelAttribute Topic topic ,@ModelAttribute PageVo page){
+        QueryWrapper<Topic> qw = new QueryWrapper<>();
+        qw.eq("tea_id",securityUtil.getCurrUser().getId());
+        IPage<Topic> data = iTopicService.page(PageUtil.initMpPage(page),qw);
+        return new ResultUtil<IPage<Topic>>().setData(data);
+    }
+
+
     @RequestMapping(value = "/getByAdminPage", method = RequestMethod.GET)
     @ApiOperation(value = "查询所有毕业设计课题")
     public Result<IPage<Topic>> getByAdminPage(@ModelAttribute Topic topic ,@ModelAttribute PageVo page){
@@ -90,6 +111,7 @@ public class TopicController {
         if(!NullUtils.isNull(topic.getLevel())) {
             qw.eq("level",topic.getLevel());
         }
+        qw.eq("pass", topic.getPass());
         IPage<Topic> data = iTopicService.page(PageUtil.initMpPage(page),qw);
         return new ResultUtil<IPage<Topic>>().setData(data);
     }
@@ -103,9 +125,6 @@ public class TopicController {
         }
         if(!NullUtils.isNull(topic.getType())) {
             qw.eq("type",topic.getType());
-        }
-        if(!NullUtils.isNull(topic.getRemark())) {
-            qw.like("remark",topic.getRemark());
         }
         if(!NullUtils.isNull(topic.getLevel())) {
             qw.eq("level",topic.getLevel());
@@ -126,14 +145,10 @@ public class TopicController {
         if(!NullUtils.isNull(topic.getType())) {
             qw.eq("type",topic.getType());
         }
-        if(!NullUtils.isNull(topic.getRemark())) {
-            qw.like("remark",topic.getRemark());
-        }
         if(!NullUtils.isNull(topic.getLevel())) {
             qw.eq("level",topic.getLevel());
         }
-        qw.eq("check_flag",true);
-        qw.eq("check_id",securityUtil.getCurrUser().getId());
+        qw.eq("id",securityUtil.getCurrUser().getTopicId());
         IPage<Topic> data = iTopicService.page(PageUtil.initMpPage(page),qw);
         return new ResultUtil<IPage<Topic>>().setData(data);
     }
@@ -145,6 +160,21 @@ public class TopicController {
             return new ResultUtil<Topic>().setData(topic);
         }
         return ResultUtil.error();
+    }
+
+    @RequestMapping(value = "/getMyStudent", method = RequestMethod.GET)
+    @ApiOperation(value = "查询选择我发布的毕业设计课题的学生")
+    public Result<IPage<User>> getMyStudent(@ModelAttribute User user ,@ModelAttribute PageVo page){
+        QueryWrapper<User> qw = new QueryWrapper<>();
+        if(!NullUtils.isNull(user.getNickname())) {
+            qw.eq("nickname",user.getNickname());
+        }
+        if(!NullUtils.isNull(user.getDepartmentTitle())) {
+            qw.eq("department_title",user.getDepartmentTitle());
+        }
+        qw.eq("my_tea_id",securityUtil.getCurrUser().getNickname());
+        IPage<User> data = iUserService.page(PageUtil.initMpPage(page),qw);
+        return new ResultUtil<IPage<User>>().setData(data);
     }
 
     @RequestMapping(value = "/insert", method = RequestMethod.POST)
@@ -181,18 +211,21 @@ public class TopicController {
         if(topic == null) {
             return ResultUtil.error("课题不存在");
         }
-        if(currUser.isCheckFlag()){
-           return ResultUtil.error("您已有选题！");
+        if(!NullUtils.isNull(currUser.getMyTeaId()) && !NullUtils.isNull(currUser.getTopicName())){
+            return ResultUtil.error("您已有选题");
         }
-//        if(topic.getQuota() == 0) {
-//            topic.setCheckFlag(true);
-//            return ResultUtil.error("选题人数已达上限");
-//        }
+        if(topic.getQuota() == 0) {
+            topic.setCheckFlag(true);
+            return ResultUtil.error("选题人数已达上限");
+        }
         currUser.setCheckFlag(true);
-        topic.setCheckFlag(true);
-        topic.setCheckId(currUser.getId());
-        topic.setCheckName(currUser.getNickname());
-//        topic.setQuota(topic.getQuota() - 1);
+        currUser.setTopicId(topic.getId());
+        currUser.setMyTeaId(topic.getTeaName());
+        currUser.setTopicName(topic.getTitle());
+//        topic.setCheckFlag(true);
+        topic.setCheckId(topic.getCheckId() + " " + "'" + currUser.getId() + "'" + " ");
+        topic.setCheckName(topic.getCheckName() + " " + currUser.getNickname());
+        topic.setQuota(topic.getQuota() - 1);
         iTopicService.saveOrUpdate(topic);
         iUserService.saveOrUpdate(currUser);
         return ResultUtil.success();
@@ -203,30 +236,55 @@ public class TopicController {
     public Result<Object> checkNotTopic(@RequestParam String id){
         Topic topic = iTopicService.getById(id);
         User currUser = securityUtil.getCurrUser();
-
         if(topic == null) {
             return ResultUtil.error("课题不存在");
         }
         currUser.setCheckFlag(false);
+        currUser.setTopicId("");
+        currUser.setMyTeaId("");
+        currUser.setAudit(false);
+        currUser.setTopicName("");
         topic.setCheckFlag(false);
-        topic.setCheckId("");
-        topic.setCheckName("");
-        topic.setAuditFlag(false);
-        //topic.setQuota(topic.getQuota() + 1);
+        topic.setCheckId(topic.getCheckId().replace(" " + "'" + currUser.getId() + "'", ""));
+        topic.setCheckName(topic.getCheckName().replace(currUser.getNickname(), ""));
+        //topic.setAuditFlag(false);
+        topic.setQuota(topic.getQuota() + 1); //名额加一
         iTopicService.saveOrUpdate(topic);
         iUserService.saveOrUpdate(currUser);
         return ResultUtil.success();
     }
 
-    @RequestMapping(value = "/auditTopic", method = RequestMethod.POST)
-    @ApiOperation(value = "审核课题")
-    public Result<Object> auditTopic(@RequestParam String id){
-        Topic topic = iTopicService.getById(id);
-        if(topic == null) {
-            return ResultUtil.error("课题不存在");
-        }
-        topic.setAuditFlag(true);
+    @RequestMapping(value = "/checkNotTopicByTea", method = RequestMethod.POST)
+    @ApiOperation(value = "教师驳回课题课题")
+    public Result<Object> checkNotTopicByTea(@RequestParam String id){
+        User user = iUserService.getById(id);
+        Topic topic = iTopicService.getById(user.getTopicId());
+        user.setAudit(false);
+        user.setMyTeaId("");
+        user.setTopicId("");
+        user.setTopicName("");
+        topic.setCheckId(topic.getCheckId().replace(" " + "'" + user.getId() + "'" + " ", ""));
+        topic.setCheckName(topic.getCheckName().replace(user.getNickname(), ""));
+        topic.setQuota(topic.getQuota() + 1); //名额加一
         iTopicService.saveOrUpdate(topic);
+        iUserService.saveOrUpdate(user);
+        return ResultUtil.success();
+    }
+
+    @RequestMapping(value = "/auditTopic", method = RequestMethod.POST)
+    @ApiOperation(value = "教师审核课题")
+    public Result<Object> auditTopic(@RequestParam String id){
+        User user = iUserService.getById(id);
+//        if(topic == null) {
+//            return ResultUtil.error("课题不存在");
+//        }
+        if(user == null) {
+            return ResultUtil.error("用户不存在");
+        }
+        user.setAudit(true);
+//        topic.setAuditFlag(true);
+//        iTopicService.saveOrUpdate(topic);
+        iUserService.saveOrUpdate(user);
         return ResultUtil.success();
     }
 

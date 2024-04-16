@@ -33,3 +33,6 @@ export const checkNotTopic = (params) => {
 export const checkTopic = (params) => {
     return postRequest('/topic/checkTopic', params)
 }
+export const getUserList = (params) => {
+    return getRequest('/user/getMyStudent', params)
+}

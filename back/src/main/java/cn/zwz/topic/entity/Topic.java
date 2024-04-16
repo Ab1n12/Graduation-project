@@ -43,10 +43,10 @@ public class Topic extends BaseEntity {
     @ApiModelProperty(value = "发布教师")
     private String teaName;
 
-    @ApiModelProperty(value = "是否被选择")
+    @ApiModelProperty(value = "是否有剩余名额")
     private boolean checkFlag;
 
-    @ApiModelProperty(value = "选题人")
+    @ApiModelProperty(value = "选题人ID")
     private String checkId;
 
     @ApiModelProperty(value = "选题人")
@@ -56,8 +56,12 @@ public class Topic extends BaseEntity {
     private boolean auditFlag;
 
     @ApiModelProperty(value = "剩余名额")
-    private String quota;
+    private Integer quota;
 
     @ApiModelProperty(value = "是否被管理员审核")
     private boolean pass;
+
+    public Boolean getPass() {
+        return pass;
+    }
 }

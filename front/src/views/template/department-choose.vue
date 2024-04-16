@@ -1,6 +1,6 @@
 <template>
 <div>
-    <Cascader v-model="selectDep" :data="department" :load-data="loadData" @on-change="handleChangeDep" change-on-select filterable clearable placeholder="选择部门"></Cascader>
+    <Cascader v-model="selectDep" :data="department" :load-data="loadData" @on-change="handleChangeDep" change-on-select filterable clearable placeholder="选择专业"></Cascader>
 </div>
 </template>
 

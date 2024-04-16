@@ -198,6 +198,20 @@ public class UserController {
         return new ResultUtil<IPage<User>>().setData(userData);
     }
 
+    @RequestMapping(value = "/getMyStudent", method = RequestMethod.GET)
+    @ApiOperation(value = "查询选择我发布的毕业设计课题的学生")
+    public Result<IPage<User>> getMyStudent(@ModelAttribute User user ,@ModelAttribute PageVo page){
+        QueryWrapper<User> qw = new QueryWrapper<>();
+        if(!NullUtils.isNull(user.getNickname())) {
+            qw.eq("nickname",user.getNickname());
+        }
+        if(!NullUtils.isNull(user.getDepartmentTitle())) {
+            qw.eq("department_title",user.getDepartmentTitle());
+        }
+        qw.eq("my_tea_id",securityUtil.getCurrUser().getNickname());
+        IPage<User> data = iUserService.page(PageUtil.initMpPage(page),qw);
+        return new ResultUtil<IPage<User>>().setData(data);
+    }
 
 
     @SystemLog(about = "查询用户", type = LogType.DATA_CENTER,doType = "USER-07")

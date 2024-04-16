@@ -2,10 +2,10 @@
 <div>
     <div style="display:flex;">
         <Input v-model="departmentTitle" readonly style="margin-right:10px;" :placeholder="placeholder" :clearable="clearable" @on-clear="clearSelect" />
-        <Poptip transfer trigger="click" placement="right" title="选择部门" width="250">
-            <Button icon="md-list">选择部门</Button>
+        <Poptip transfer trigger="click" placement="right" title="选择专业" width="250">
+            <Button icon="md-list">选择专业</Button>
             <div slot="content">
-                <Input v-model="searchKey" suffix="ios-search" @on-change="searchDep" placeholder="输入部门名搜索" clearable />
+                <Input v-model="searchKey" suffix="ios-search" @on-change="searchDep" placeholder="输入专业名搜索" clearable />
                 <div class="dep-tree-bar">
                     <Tree :data="dataDep" :load-data="loadData" @on-select-change="selectTree" :multiple="multiple"></Tree>
                     <Spin size="large" fix v-if="depLoading"></Spin>
@@ -35,7 +35,7 @@ export default {
         },
         placeholder: {
             type: String,
-            default: "点击选择部门"
+            default: "点击选择专业"
         }
     },
     data() {
