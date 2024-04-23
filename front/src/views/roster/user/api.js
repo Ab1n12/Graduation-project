@@ -33,3 +33,16 @@ export const addUser = (params) => {
 export const editUser = (params) => {
     return postRequest('/user/admin/edit', params)
 }
+
+export const getTea = (params) => {
+    return postRequest('/user/getTea', params)
+}
+export const getAdmin = (params) => {
+    return postRequest('/user/getAdmin', params)
+}
+export const getStu = (params) => {
+    return postRequest('/user/getStu', params)
+}
+export const getAll = (params) => {
+    return getRequest('/user/getAll', params)
+}

@@ -101,7 +101,7 @@ export default {
   mounted() {
     this.emojis = emojis.split(',')
     this.user = JSON.parse(localStorage.getItem('user') || "{}")
-    let name = window.btoa(encodeURI(JSON.parse(getStore("userInfo")).username))
+    let name = window.btoa(encodeURI(JSON.parse(getStore("userInfo")).nickname))
     let avatar = window.btoa(encodeURI(JSON.parse(getStore("userInfo")).avatar))
 
     client = new WebSocket(`ws://localhost:8081/imserver/${name}/${avatar}`)
@@ -149,7 +149,7 @@ export default {
           message.type = 'file'
         }
         let avatar = JSON.parse(getStore("userInfo")).avatar
-        message.name = JSON.parse(getStore("userInfo")).username
+        message.name = JSON.parse(getStore("userInfo")).nickname
         message.avatar = avatar
         client.send(JSON.stringify(message))
       }
@@ -175,10 +175,10 @@ export default {
       }
 
       let avatar = JSON.parse(getStore("userInfo")).avatar
-      let username = JSON.parse(getStore("userInfo")).username
+      let nickname = JSON.parse(getStore("userInfo")).nickname
       if (client) {
         let message = {name: this.user.name, content: content, avatar: this.user.avatar, type: 'text'}
-        message.name = username
+        message.name = nickname
         message.avatar = avatar
         client.send(JSON.stringify(message))
       }

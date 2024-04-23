@@ -83,12 +83,12 @@
                     "选择",
                     "序号",
                     "课题名称",
-                    "课题类型",
+                    //"课题类型",
                     "课题难度",
                     "剩余名额",
                     "选题要求",
                     "发布教师",
-                    "是否有剩余名额",
+                    //"是否有剩余名额",
                     //"选题人",
                     "是否被审核",
                     "创建时间",
@@ -138,7 +138,7 @@
                     },
                     {
                         title: "课题名称",
-                        key: "title",
+                        key: "topicName",
                         minWidth: 200,
                         tooltip: true,
                         align: "center",
@@ -146,7 +146,7 @@
                     },
                     {
                         title: "课题类型",
-                        key: "type",
+                        key: "topicType",
                         minWidth: 120,
                         tooltip: true,
                         align: "center",
@@ -154,23 +154,23 @@
                     },
                     {
                         title: "课题难度",
-                        key: "level",
+                        key: "topicLevel",
                         minWidth: 120,
                         tooltip: true,
                         align: "center",
                         sortable: false,
                     },
-                    {
-                        title: "剩余名额",
-                        key: "quota",
-                        minWidth: 110,
-                        tooltip: true,
-                        align: "center",
-                        sortable: false,
-                    },
+                    // {
+                    //     title: "剩余名额",
+                    //     key: "quota",
+                    //     minWidth: 110,
+                    //     tooltip: true,
+                    //     align: "center",
+                    //     sortable: false,
+                    // },
                     {
                         title: "选题要求",
-                        key: "remark",
+                        key: "topicRemark",
                         minWidth: 150,
                         tooltip: true,
                         align: "center",
@@ -178,45 +178,45 @@
                     },
                     {
                         title: "发布教师",
-                        key: "teaName",
+                        key: "myTeaId",
                         minWidth: 120,
                         tooltip: true,
                         align: "center",
                         sortable: false,
                     },
-                    {
-                        title: "是否有剩余名额",
-                        key: "checkFlag",
-                        minWidth: 130,
-                        tooltip: true,
-                        align: "center",
-                        sortable: false,
-                        render: (h, params) => {
-                            if (params.row.checkFlag) {
-                                return h("div", [
-                                    h(
-                                        "span", {
-                                            style: {
-                                                color: "#ff0000",
-                                            },
-                                        },
-                                        "否"
-                                    ),
-                                ]);
-                            } else {
-                                return h("div", [
-                                    h(
-                                        "span", {
-                                            style: {
-                                                color: "#3CB371",
-                                            },
-                                        },
-                                        "是"
-                                    ),
-                                ]);
-                            }
-                        },
-                    },
+                    // {
+                    //     title: "是否有剩余名额",
+                    //     key: "checkFlag",
+                    //     minWidth: 130,
+                    //     tooltip: true,
+                    //     align: "center",
+                    //     sortable: false,
+                    //     render: (h, params) => {
+                    //         if (params.row.checkFlag) {
+                    //             return h("div", [
+                    //                 h(
+                    //                     "span", {
+                    //                         style: {
+                    //                             color: "#ff0000",
+                    //                         },
+                    //                     },
+                    //                     "否"
+                    //                 ),
+                    //             ]);
+                    //         } else {
+                    //             return h("div", [
+                    //                 h(
+                    //                     "span", {
+                    //                         style: {
+                    //                             color: "#3CB371",
+                    //                         },
+                    //                     },
+                    //                     "是"
+                    //                 ),
+                    //             ]);
+                    //         }
+                    //     },
+                    // },
                     // {
                     //     title: "选题人",
                     //     key: "checkName",
@@ -325,7 +325,7 @@
                                             size: "small",
                                             icon: "ios-create-outline",
                                             ghost: true,
-                                            disabled: (params.row.taskFile === undefined)
+                                            disabled: (params.row.topicTaskFile === undefined)
                                         },
                                         style: {
                                             marginRight: "5px"
@@ -354,16 +354,17 @@
         methods: {
             init() {
                 this.getDataList();
-                this.getUserList();
+                //this.getUserList();
+
             },
             uploadFileFx(e) {
                 this.mySelectRow = e;
                 this.uploadFileMoadl = true;
             },
-            created() {
-                // 在组件加载时获取用户列表数据
-                this.userDataList = this.getUserList();
-            },
+            // created() {
+            //     // 在组件加载时获取用户列表数据
+            //     this.columns.audit = this.getUserList();
+            // },
             checkTopicFx(e) {
                 var that = this;
                 checkNotTopic({
@@ -372,7 +373,7 @@
                     if (res.success) {
                         this.$Message.success("取消选题成功");
                         that.getDataList();
-                        that.getUserList();
+                        //that.getUserList();
                     }
                 })
             },
@@ -384,26 +385,30 @@
                     if (res.success) {
                         this.$Message.success("审核成功");
                         that.getDataList();
-                        that.getUserList();
+                        //that.getUserList();
                     }
                 })
             },
             downFileFx(e) {
-                window.open(e.taskFile);
+                window.open(e.TopicTaskFile);
             },
             submited() {
                 this.currView = "index";
-                this.getUserList();
+                this.created();
                 this.getDataList();
             },
             changePage(v) {
                 this.searchForm.pageNumber = v;
                 this.getDataList();
+                //this.created();
                 this.clearSelectAll();
+                //this.getUserList();
             },
             changePageSize(v) {
                 this.searchForm.pageSize = v;
                 this.getDataList();
+                //this.created();
+                //this.getUserList();
             },
             rowClick(row, index) {
                 this.selectRow = row;
@@ -423,6 +428,8 @@
                 this.searchForm.pageNumber = 1;
                 this.searchForm.pageSize = 15;
                 this.getDataList();
+                //this.created();
+                //this.getUserList();
             },
             handleReset() {
                 this.$refs.searchForm.resetFields();
@@ -430,6 +437,8 @@
                 this.searchForm.pageSize = 15;
                 // 重新加载数据
                 this.getDataList();
+                //this.created();
+                //this.getUserList();
             },
             changeSort(e) {
                 this.searchForm.sort = e.key;
@@ -438,6 +447,8 @@
                     this.searchForm.order = "";
                 }
                 this.getDataList();
+                //this.created();
+                //this.getUserList();
             },
             clearSelectAll() {
                 this.$refs.table.selectAll(false);
@@ -445,16 +456,6 @@
             changeSelect(e) {
                 this.selectList = e;
                 this.selectCount = e.length;
-            },
-            getUserList() {
-                    this.loading = true;
-                    getUserList(this.searchForm).then(res => {
-                        this.loading = false;
-                        if (res.success) {
-                            this.data = res.result.records;
-                            this.total = res.result.total;
-                        }
-                    });
             },
             getDataList() {
                 this.loading = true;
@@ -465,7 +466,9 @@
                         this.total = res.result.total;
                     }
                 });
-            }
+            },
+            
+            
         },
         mounted() {
             this.init();

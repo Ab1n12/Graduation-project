@@ -168,14 +168,14 @@ export default {
                 {
                     title: "专业",
                     key: "departmentTitle",
-                    minWidth: 160,
+                    minWidth: 190,
                     align: "center",
                     sortable: true
                 },
                 {
                     title: "手机",
                     key: "mobile",
-                    minWidth: 125,
+                    minWidth: 135,
                     align: "center",
                     sortable: true
                 },

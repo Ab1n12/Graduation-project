@@ -3,12 +3,22 @@
     <div class="main-body-content">
       <div style="display: flex; align-items: flex-start">
         <div style="width: 200px; border: 1px solid #ddd; border-radius: 5px; height: calc(50vh + 125px);">
-          <div style="padding: 10px; border-bottom: 1px solid #ddd; color: #000; background-color: #eee">用户</div>
+          <div style="padding: 10px; font-size: 15px; border-bottom: 1px solid #ddd; color: #000; background-color: #eee; text-align: center">教师用户</div>
           <div class="user-list-box">
-            <div class="user-list-item" v-for="item in users.admin" @click="selectToUser(item)">
+            <div class="user-list-item" v-for = "item in users.admin" @click="selectToUser(item)">
               <img :src="item.avatar" style="width: 30px; height: 30px; border-radius: 50%">
-              <span style="flex: 1; margin-left: 10px;" :style="{ color: item.role+ '_' + item.name === toUser ? '#3a8ee6' : '' }">{{ item.username }}</span>
-              <div class="user-list-item-badge" v-if="unRead?.[item.role + '_' + item.username]">{{ unRead?.[item.role + '_' + item.username] }}</div>
+              <span style="flex: 1; margin-left: 10px;" :style="{ color: item.role+ '_' + item.name === toUser ? '#3a8ee6' : '' }">{{ item.nickname }}</span>
+              <div class="user-list-item-badge" v-if="unRead?.[item.role + '_' + item.nickname]">{{ unRead?.[item.role + '_' + item.nickname] }}</div>
+            </div>
+          </div>
+        </div>
+        <div style="width: 200px; border: 1px solid #ddd; border-radius: 5px; height: calc(50vh + 125px);">
+          <div style="padding: 10px; font-size: 15px; border-bottom: 1px solid #ddd; color: #000; background-color: #eee; text-align: center">学生用户</div>
+          <div class="user-list-box">
+            <div class="user-list-item" v-for = "item in users.stu" @click="selectToUser(item)">
+              <img :src="item.avatar" style="width: 30px; height: 30px; border-radius: 50%">
+              <span style="flex: 1; margin-left: 10px;" :style="{ color: item.role+ '_' + item.name === toUser ? '#3a8ee6' : '' }">{{ item.nickname }}</span>
+              <div class="user-list-item-badge" v-if="unRead?.[item.role + '_' + item.nickname]">{{ unRead?.[item.role + '_' + item.nickname] }}</div>
             </div>
           </div>
         </div>
@@ -97,7 +107,7 @@
 <script>
 import request from "@/utils/request";
 import emojis from "@/assets/emoji";
-import {getUserAll} from "@/views/roster/user/api";
+import {getUserAll, getTea, getStu, getAll} from "@/views/roster/user/api";
 
 let client
 export default {
@@ -118,7 +128,7 @@ export default {
   mounted() {
     this.emojis = emojis.split(',')
     this.user = JSON.parse(localStorage.getItem('userInfo') || "{}")
-    this.fromUser = this.user.username
+    this.fromUser = this.user.nickname
 
     client = new WebSocket(`ws://localhost:8081/imserverSingle`)
     client.onopen = () => {
@@ -147,9 +157,15 @@ export default {
     // 加载聊天数据
     this.load()
 
-    // 查询用户
+   // 查询用户
     getUserAll().then(res => {
+      res.result = res.result.filter(v => v.type === 1)
       this.$set(this.users, 'admin', res.result)
+    })
+
+    getUserAll().then(res => {
+      res.result = res.result.filter(v => v.type === 0)
+      this.$set(this.users, 'stu', res.result)
     })
 
 
@@ -197,11 +213,11 @@ export default {
       document.getElementById('im-content').innerHTML = ''  // 清空输入框
     },
     selectToUser(item) {
-      if (item.username === this.fromUser){
+      if (item.nickname === this.fromUser){
         this.$notify.error('聊天对象不能选择自己')
         return
       }
-      this.toUser = item.username
+      this.toUser = item.nickname
       this.toAvatar = item.avatar
       //查询聊天记录
       this.load()
@@ -271,10 +287,10 @@ export default {
 }
 
 .user-list-box {
-  /* overflow-y: auto; */
-  overflow-y:scroll;
+  overflow-y: auto;
+  /* overflow-y:scroll; */
   overflow-x:hidden;
-  height: 93%;
+  height: 91.5%;
 }
 
 .im-message-box::-webkit-scrollbar, .emoji-box::-webkit-scrollbar, .user-list-box::-webkit-scrollbar {
@@ -322,6 +338,7 @@ export default {
   border-bottom: 1px solid #eee;
   cursor: pointer;
   font-size: 14px;
+  overflow-y:auto
 }
 
 .user-list-item-badge {

@@ -149,8 +149,19 @@ public class TopicController {
             qw.eq("level",topic.getLevel());
         }
         qw.eq("id",securityUtil.getCurrUser().getTopicId());
+
         IPage<Topic> data = iTopicService.page(PageUtil.initMpPage(page),qw);
         return new ResultUtil<IPage<Topic>>().setData(data);
+    }
+
+    @RequestMapping(value = "/getByMyPageUser", method = RequestMethod.GET)
+    @ApiOperation(value = "查询我选的毕业设计课题")
+    public Result<IPage<User>> getByMyPageUser(@ModelAttribute User user ,@ModelAttribute PageVo page){
+        QueryWrapper<User> qw = new QueryWrapper<>();
+        qw.eq("check_flag", "1");
+        qw.eq("id",securityUtil.getCurrUser().getId());
+        IPage<User> data = iUserService.page(PageUtil.initMpPage(page),qw);
+        return new ResultUtil<IPage<User>>().setData(data);
     }
 
     @RequestMapping(value = "/insertOrUpdate", method = RequestMethod.POST)
@@ -218,14 +229,29 @@ public class TopicController {
             topic.setCheckFlag(true);
             return ResultUtil.error("选题人数已达上限");
         }
+        //迫不得已之举。。。
         currUser.setCheckFlag(true);
         currUser.setTopicId(topic.getId());
         currUser.setMyTeaId(topic.getTeaName());
         currUser.setTopicName(topic.getTitle());
+
+        currUser.setTopicType(topic.getType());
+        currUser.setTopicRemark(topic.getRemark());
+        currUser.setTopicLevel(topic.getLevel());
+        currUser.setTopicTaskFile(topic.getTaskFile());
 //        topic.setCheckFlag(true);
-        topic.setCheckId(topic.getCheckId() + " " + "'" + currUser.getId() + "'" + " ");
-        topic.setCheckName(topic.getCheckName() + " " + currUser.getNickname());
+        if(topic.getCheckId() != null){
+            topic.setCheckId(topic.getCheckId() + " " + "'" + currUser.getId() + "'" + " ");
+            topic.setCheckName(topic.getCheckName() + " " + currUser.getNickname());
+        } else {
+            topic.setCheckId("'" + currUser.getId() + "'");
+            topic.setCheckName(" " + currUser.getNickname());
+        }
         topic.setQuota(topic.getQuota() - 1);
+        //每次选择完之后都要判断一下是否还有剩余，不能等出发选择时再进行判断和更改
+        if(topic.getQuota() == 0) {
+            topic.setCheckFlag(true);
+        }
         iTopicService.saveOrUpdate(topic);
         iUserService.saveOrUpdate(currUser);
         return ResultUtil.success();
@@ -234,8 +260,8 @@ public class TopicController {
     @RequestMapping(value = "/checkNotTopic", method = RequestMethod.POST)
     @ApiOperation(value = "取消选择课题")
     public Result<Object> checkNotTopic(@RequestParam String id){
-        Topic topic = iTopicService.getById(id);
         User currUser = securityUtil.getCurrUser();
+        Topic topic = iTopicService.getById(currUser.getTopicId());
         if(topic == null) {
             return ResultUtil.error("课题不存在");
         }
@@ -244,6 +270,11 @@ public class TopicController {
         currUser.setMyTeaId("");
         currUser.setAudit(false);
         currUser.setTopicName("");
+
+        currUser.setTopicType("");
+        currUser.setTopicRemark("");
+        currUser.setTopicLevel("");
+        currUser.setTopicTaskFile("");
         topic.setCheckFlag(false);
         topic.setCheckId(topic.getCheckId().replace(" " + "'" + currUser.getId() + "'", ""));
         topic.setCheckName(topic.getCheckName().replace(currUser.getNickname(), ""));
@@ -263,6 +294,12 @@ public class TopicController {
         user.setMyTeaId("");
         user.setTopicId("");
         user.setTopicName("");
+        user.setCheckFlag(false);
+
+        user.setTopicType("");
+        user.setTopicLevel("");
+        user.setTopicRemark("");
+        user.setTopicTaskFile("");
         topic.setCheckId(topic.getCheckId().replace(" " + "'" + user.getId() + "'" + " ", ""));
         topic.setCheckName(topic.getCheckName().replace(user.getNickname(), ""));
         topic.setQuota(topic.getQuota() + 1); //名额加一

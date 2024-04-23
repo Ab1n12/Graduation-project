@@ -4,7 +4,7 @@ export const getTopicOne = (params) => {
     return getRequest('/topic/getOne', params)
 }
 export const getTopicList = (params) => {
-    return getRequest('/topic/getByMyPage', params)
+    return getRequest('/topic/getByMyPageUser', params)
 }
 export const getTopicCount = (params) => {
     return getRequest('/topic/count', params)
@@ -33,6 +33,6 @@ export const checkNotTopic = (params) => {
 export const checkTopic = (params) => {
     return postRequest('/topic/checkTopic', params)
 }
-export const getUserList = (params) => {
-    return getRequest('/user/getMyStudent', params)
-}
+// export const getUserList = (params) => {
+//     return getRequest('/topic/getByMyPageUser', params)
+// }

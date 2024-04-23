@@ -94,9 +94,9 @@
                     "发布教师",
                     "创建时间",
                     "创建者",
+                    "是否被管理员审核",
                     "修改时间",
                     "修改者",
-                    "是否被管理员审核",
                     "操作",
                 ],
                 modal1: false,
@@ -205,20 +205,6 @@
                         tooltip: true,
                     },
                     {
-                        title: "修改时间",
-                        key: "updateTime",
-                        minWidth: 180,
-                        align: "center",
-                        tooltip: true,
-                    },
-                    {
-                        title: "修改者",
-                        key: "updateBy",
-                        minWidth: 100,
-                        align: "center",
-                        tooltip: true,
-                    },
-                    {
                         title: "是否被管理员审核",
                         key: "pass",
                         minWidth: 135,
@@ -250,6 +236,20 @@
                                 ]);
                             }
                         },
+                    },
+                    {
+                        title: "修改时间",
+                        key: "updateTime",
+                        minWidth: 180,
+                        align: "center",
+                        tooltip: true,
+                    },
+                    {
+                        title: "修改者",
+                        key: "updateBy",
+                        minWidth: 100,
+                        align: "center",
+                        tooltip: true,
                     },
                     {
                         title: "操作",

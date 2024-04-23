@@ -167,7 +167,7 @@
                     {
                         title: "选题要求",
                         key: "remark",
-                        minWidth: 150,
+                        minWidth: 200,
                         tooltip: true,
                         align: "center",
                         sortable: false,
@@ -216,7 +216,7 @@
                     {
                         title: "选题人",
                         key: "checkName",
-                        minWidth: 120,
+                        minWidth: 200,
                         tooltip: true,
                         align: "center",
                         sortable: false,

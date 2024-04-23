@@ -116,4 +116,16 @@ public class User extends BaseEntity {
 
     @ApiModelProperty(value = "学生选题是否被审核")
     private boolean audit; //用于教师用户查询选了自己题目的学生
+
+    @ApiModelProperty(value = "课题类型")
+    private String topicType;
+
+    @ApiModelProperty(value = "课题难度")
+    private String topicLevel;
+
+    @ApiModelProperty(value = "选题要求")
+    private String topicRemark;
+
+    @ApiModelProperty(value = "课题任务书")
+    private String topicTaskFile;
 }

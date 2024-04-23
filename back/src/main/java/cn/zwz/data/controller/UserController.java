@@ -13,6 +13,7 @@ import cn.zwz.data.utils.NullUtils;
 import cn.zwz.data.vo.PermissionDTO;
 import cn.zwz.data.vo.RoleDTO;
 import cn.hutool.core.util.StrUtil;
+import cn.zwz.topic.entity.Topic;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import io.swagger.annotations.Api;
@@ -236,12 +237,13 @@ public class UserController {
     }
 
 
-    @SystemLog(about = "根据部门查询用户", type = LogType.DATA_CENTER,doType = "USER-08")
+
+    @SystemLog(about = "根据专业查询用户", type = LogType.DATA_CENTER,doType = "USER-08")
     @RequestMapping(value = "/getByDepartmentId", method = RequestMethod.GET)
-    @ApiOperation(value = "根据部门查询用户")
-    public Result<List<User>> getByCondition(@RequestParam String departmentId){
+    @ApiOperation(value = "根据专业查询用户")
+    public Result<List<User>> getByCondition(){
         QueryWrapper<User> userQw = new QueryWrapper<>();
-        userQw.eq("department_id", departmentId);
+        userQw.eq("department_title", "教师");
         List<User> list = iUserService.list(userQw);
         entityManager.clear();
         list.forEach(u -> {
@@ -268,13 +270,49 @@ public class UserController {
     @SystemLog(about = "查询全部用户", type = LogType.DATA_CENTER,doType = "USER-10")
     @RequestMapping(value = "/getAll", method = RequestMethod.GET)
     @ApiOperation(value = "查询全部用户")
-    public Result<List<User>> getAll(){
+    public Result<List<User>> getAll() {
         List<User> userList = iUserService.list();
-        for(User user: userList){
+        List<User> filteredUsers = new ArrayList<>();
+        for (User user : userList) {
             entityManager.clear();
-            user.setPassword(null);
+            if (user.getType() == 1) {
+                user.setPassword(null);
+                filteredUsers.add(user);
+            }
         }
-        return new ResultUtil<List<User>>().setData(userList);
+        return new ResultUtil<List<User>>().setData(filteredUsers);
+    }
+
+    @SystemLog(about = "查询教师用户", type = LogType.DATA_CENTER, doType = "USER-10")
+    @RequestMapping(value = "/getTea", method = RequestMethod.GET)
+    @ApiOperation(value = "查询教师用户")
+    public Result<List<User>> getTea() {
+        List<User> userList = iUserService.list();
+        List<User> filteredUsers = new ArrayList<>();
+        for (User user : userList) {
+            entityManager.clear();
+            if (user.getType() == 1) {
+                user.setPassword(null);
+                filteredUsers.add(user);
+            }
+        }
+        return new ResultUtil<List<User>>().setData(filteredUsers);
+    }
+
+    @SystemLog(about = "查询学生用户", type = LogType.DATA_CENTER, doType = "USER-10")
+    @RequestMapping(value = "/getStu", method = RequestMethod.GET)
+    @ApiOperation(value = "查询学生用户")
+    public Result<List<User>> getStu() {
+        List<User> userList = iUserService.list();
+        List<User> filteredUsers = new ArrayList<>();
+        for (User user : userList) {
+            entityManager.clear();
+            if (user.getType() == 0) {
+                user.setPassword(null);
+                filteredUsers.add(user);
+            }
+        }
+        return new ResultUtil<List<User>>().setData(filteredUsers);
     }
 
     @SystemLog(about = "管理员修改资料", type = LogType.DATA_CENTER,doType = "USER-11")
